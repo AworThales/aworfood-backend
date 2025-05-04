@@ -5,8 +5,8 @@
   "description": "Food Ordering",
   "main": "index.js",
   "scripts": {
-    "start": "index.js",
-    "dev": "SET NODE_ENV=DEVELOPMENT& nodemon index.js"
+    "dev": "nodemon index.js",
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "Thales Awor",
