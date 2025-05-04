@@ -28,11 +28,12 @@ const app = express();
 ConnectDB();
 
 // CORS configuration
-app.use(cors({
-    origin: 'https://aworfood-frontend.vercel.app', // Your frontend URL
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true,
-}));
+// app.use(cors({
+//     origin: 'https://aworfood-frontend.vercel.app', // Your frontend URL
+//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//     credentials: true,
+// }));
+app.use(cors({ origin: "https://aworfood-frontend.vercel.app", credentials: true }));
 
 // Parse JSON and preserve raw body (for Stripe, etc.)
 app.use(express.json({
