@@ -4,6 +4,8 @@ import orderModel from "../models/orderModel.js";
 import sendEmail from "../utils/sendEmail.js";
 import { generateOrderEmailTemplate } from "../utils/generateOrderEmailTemplate.js";
 import userModel from "../models/userModel.js";
+import dotenv from 'dotenv';
+dotenv.config();
 
 
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
