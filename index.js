@@ -27,13 +27,17 @@ const app = express();
 // Connect to MongoDB
 ConnectDB();
 
-// CORS configuration
-// app.use(cors({
-//     origin: 'https://aworfood-frontend.vercel.app', // Your frontend URL
-//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-//     credentials: true,
-// }));
-app.use(cors({ origin: "https://aworfood-frontend.vercel.app", credentials: true }));
+// CORS Configuration
+const FRONTEND_URL = "https://aworfood-frontend.vercel.app";
+app.use(cors({
+  origin: FRONTEND_URL,
+  credentials: true,
+}));
+app.options("*", cors({
+  origin: FRONTEND_URL,
+  credentials: true,
+}));
+
 
 // Parse JSON and preserve raw body (for Stripe, etc.)
 app.use(express.json({
@@ -58,6 +62,13 @@ app.use("/api/v1", paymentRoute);
 //         res.sendFile(path.resolve(__dirname, "../frontend/dist/index.html"));
 //     });
 // }
+
+// 404 handler for unknown routes with CORS headers
+app.use((req, res) => {
+    res.header("Access-Control-Allow-Origin", FRONTEND_URL);
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.status(404).json({ message: "Route not found" });
+  });
 
 // Error handling middleware
 app.use(errorMiddleware);
