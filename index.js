@@ -29,7 +29,7 @@ ConnectDB();
 
 // CORS configuration
 app.use(cors({
-    origin: 'http://localhost:5173', // Your frontend URL
+    origin: 'https://aworfood-frontend.vercel.app', // Your frontend URL
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
 }));
