@@ -71,45 +71,98 @@ export const getAllOrders = catchAsyncErrors(async (req, res, next) => {
 
 
 // Update Order - ADMIN  =>  /api/v1/admin/orders/:id
+// export const updateOrder = catchAsyncErrors(async (req, res, next) => {
+//     const order = await orderModel.findById(req.params.id);
+  
+//     if (!order) {
+//       return next(new ErrorHandler("No Order found with this ID", 404));
+//     }
+  
+//     if (order?.orderStatus === "Delivered") {
+//       return next(new ErrorHandler("You have already delivered this order", 400));
+//     }
+  
+//     let foodNotFound = false;
+  
+//     // Update foods stock
+//     for (const item of order.orderItems) {
+//       const food = await foodModel.findById(item?.food?.toString());
+//       if (!food) {
+//         foodNotFound = true;
+//         break;
+//       }
+//       food.stock = food.stock - item.quantity;
+//       await food.save({ validateBeforeSave: false }); //don't validation when saving food
+//     }
+  
+//     if (foodNotFound) {
+//       return next(
+//         new ErrorHandler("No Food found with one or more IDs.", 404)
+//       );
+//     }
+  
+//     order.orderStatus = req.body.status;
+//     order.deliveredAt = Date.now();
+  
+//     await order.save();
+  
+//     res.status(200).json({
+//       success: true,
+//     });
+// });
+
+// Update Order - ADMIN  =>  /api/v1/admin/orders/:id
 export const updateOrder = catchAsyncErrors(async (req, res, next) => {
-    const order = await orderModel.findById(req.params.id);
-  
-    if (!order) {
-      return next(new ErrorHandler("No Order found with this ID", 404));
+  const order = await orderModel.findById(req.params.id);
+
+  if (!order) {
+    return next(new ErrorHandler("No Order found with this ID", 404));
+  }
+
+  if (order?.orderStatus === "Delivered") {
+    return next(new ErrorHandler("You have already delivered this order", 400));
+  }
+
+  let foodNotFound = false;
+
+  // Update food stock
+  for (const item of order.orderItems) {
+    const food = await foodModel.findById(item?.food?.toString());
+    if (!food) {
+      foodNotFound = true;
+      break;
     }
-  
-    if (order?.orderStatus === "Delivered") {
-      return next(new ErrorHandler("You have already delivered this order", 400));
-    }
-  
-    let foodNotFound = false;
-  
-    // Update foods stock
-    for (const item of order.orderItems) {
-      const food = await foodModel.findById(item?.food?.toString());
-      if (!food) {
-        foodNotFound = true;
-        break;
-      }
-      food.stock = food.stock - item.quantity;
-      await food.save({ validateBeforeSave: false }); //don't validation when saving food
-    }
-  
-    if (foodNotFound) {
-      return next(
-        new ErrorHandler("No Food found with one or more IDs.", 404)
-      );
-    }
-  
-    order.orderStatus = req.body.status;
+
+    food.stock = food.stock - item.quantity;
+    await food.save({ validateBeforeSave: false });
+  }
+
+  if (foodNotFound) {
+    return next(
+      new ErrorHandler("No Food found with one or more IDs.", 404)
+    );
+  }
+
+  order.orderStatus = req.body.status;
+
+  if (req.body.status === "Delivered") {
     order.deliveredAt = Date.now();
-  
-    await order.save();
-  
-    res.status(200).json({
-      success: true,
-    });
+
+    // Automatically mark COD as paid
+    if (order.paymentMethod === "COD") {
+      order.isPaid = true;
+      order.paidAt = Date.now();
+    }
+  }
+
+  await order.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Order updated successfully",
+  });
 });
+
 
 
 // Delete order  =>  /api/v1/admin/orders/:id
